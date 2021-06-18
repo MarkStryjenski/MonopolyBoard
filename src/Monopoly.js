@@ -11,7 +11,6 @@ var player1 = new Player("Marek", 0, "blue");
 var player2 = new Player("Adam", 1, "green");
 var player3 = new Player("Jurek", 2, "red");
 
-// player1.setTotalMoneyAmount(-10);
 
 const idEndTurn = "end-turn";
 const idRollButton = "roll";
@@ -25,13 +24,6 @@ const idProposeButton = "propose-button"
 const idTradeButton = "trade-button";
 const idPlayers = "players";
 
-
-// fields[37].owner=player2;
-// fields[39].owner=player2;
-// fields[37].setComplete=true;
-// fields[39].setComplete=true;
-// console.log(fields[37]);
-// console.log(fields[39]);
 
 class Monopoly {
     numOfPlayers = 0;
@@ -66,7 +58,6 @@ class Monopoly {
         this.players.push(player1);
         this.players.push(player2);
         this.players.push(player3);
-        // console.log(this.players.length);
         this.createPlayerBoxes();
 
 
@@ -272,11 +263,6 @@ class Monopoly {
         for (let k = 0; k <= 39; k++) {
             let cell = document.getElementById("cell-" + k);
             cell.textContent = fields[k].name;
-            // let cellDiv = cell.appendChild(document.createElement("div"));
-            // cellDiv.setAttribute("id", "cell-div-" + k);
-            // // fieldName.textContent=""+fields[k].name+k;
-            // cellDiv.textContent = "" + k;
-            // cellDiv.className = "cell-div";
 
 
             var owner = cell.appendChild(document.createElement("div"));
@@ -333,14 +319,11 @@ class Monopoly {
             lastKnownPlayerPosition = (sum - eq) - 1;
             this.players[this.currentPlayer].addMoney(200);
             console.log("Player" + this.players[this.currentPlayer].name + " crossed start!!! His balance is now " + this.players[this.currentPlayer].totalMoneyAmount);
-            // lastKnownPlayerPosition=(sum+lastKnownPlayerPosition)-lastKnownPlayerPosition;
-            // lastKnownPlayerPosition=(sum+lastKnownPlayerPosition)%lastKnownPlayerPosition;
         } else {
             lastKnownPlayerPosition = lastKnownPlayerPosition + sum;
         }
         console.log(fields[lastKnownPlayerPosition]);
 
-        // console.log("POSITION BEFORE MOVING  "+ fields[lastKnownPlayerPosition].owner);
         console.log("POSITION BEFORE MOVING!!!!!!!!!!!!!!! " + lastKnownPlayerPosition);
         if (this.inJail(player) != -1) {
             this.currentField = prevField;
@@ -350,10 +333,8 @@ class Monopoly {
             }
             this.currentField = lastKnownPlayerPosition;
         }
-        // lastKnownPlayerPosition=lastKnownPlayerPosition+sum;
 
         var currentFieldObj = fields[this.currentField];
-        // console.log(currentFieldObj);
 
         console.log("last knownPosition!!!!!!!!!!!!!!! " + lastKnownPlayerPosition);
 
@@ -458,7 +439,6 @@ class Monopoly {
 
     buyProperty() {
         //We have to hide roll button
-        // console.log("c");
         let fieldOwner = document.getElementById("owner-" + this.currentField);
         let fieldPosition = document.getElementById("cell-" + this.currentField);
         let playerFieldsTable = document.getElementById("buy-table");
@@ -472,31 +452,12 @@ class Monopoly {
 
                 fields[this.currentField].owner = player;
 
-
-                // fieldPosition.style.backgroundColor = player.color;
                 fieldPosition.style.border = "3px solid " + player.color;
-                // console.log(fields[currentField].owner);
-
-                //Creating bought properties table row
-                // let tableRow = playerFieldsTable.appendChild(document.createElement("tr"));
-                // let tableData = tableRow.appendChild(document.createElement("td"));
-                // let tableDiv = tableData.appendChild(document.createElement("div"));
-                // let tableSellButton = tableData.appendChild(document.createElement("input"));
-                // tableDiv.innerHTML = fields[this.currentField].name;
-                // tableDiv.id = "field-" + fields[this.currentField].name;
-                // tableDiv.title = this.currentField + "";
-                // tableSellButton.type = "button";
-                // tableSellButton.value = "sell";
-                // tableSellButton.className = "sell-button";
-                // tableSellButton.id = "sell-button" + player.number;
-
 
                 addMessage("New owner of the field " + fields[this.currentField].name + " is " + fields[this.currentField].owner.name);
-                // console.log("New owner of the field is " + fields[currentField].owner.name);
             }
         } else {
             addMessage("Field is already owned");
-            // console.log("Field is already owned");
         }
         const buyButton = this.rootElement.querySelector(`#${idBuyButton}`);
         const passButton = this.rootElement.querySelector(`#${idPassButton}`);
@@ -653,9 +614,7 @@ class Monopoly {
         addMessage("offer AMOUNT " + amountOfMoneyOffered);
         console.log("offer AMOUNT " + amountOfMoneyOffered);
         if (amountOfMoneyOffered == 0 && amountOfMoneyWanted == 0) {
-            addMessage("BABY BLUE");
         } else if (amountOfMoneyOffered > amountOfMoneyWanted) {
-            addMessage("Money ofered");
 
             if (offeringPlayer.subtractMoney(amountOfMoneyOffered) != false) {
                 receivingPLayer.addMoney(amountOfMoneyWanted);
@@ -812,7 +771,6 @@ class Monopoly {
             const fieldOwnerDiv = this.rootElement.querySelector(`#${idFieldOwner + fieldNumber}`);
             var fieldObj = fields[fieldNumber];
             console.log(fieldObj);
-            // console.log(fieldNumber);
 
             const updateTradeTable = function () {
                 var rowData = row.appendChild(document.createElement("td"));
@@ -835,13 +793,10 @@ class Monopoly {
             }
             console.log(this.currentPlayer);
 
-            console.log("CURRRRRRRRRRRRRRENT PLAYER");
+
             console.log(currentPlayerObj);
 
             if (houseButtonClicked == true) {
-                // console.log("current field Number " + fieldOwner.title);
-                // console.log("current player " + this.currentPlayer)
-                // console.log("current player " + currentPlayerObj.number)
                 this.checkIfSetComplete(fieldObj);
                 this.buyHouse(fieldObj, fieldNumber, currentPlayerObj);
             } else if (sellButtonClicked == true) {
@@ -868,16 +823,12 @@ class Monopoly {
 
                     }
                 }
-                // this.trade();
             }
             houseButtonClicked = false;
             sellButtonClicked = false;
-            // proposeButtonClicked=false;
 
             const id = parseInt(event.target.dataset.id);
-            // console.log(event.target.dataset.id);
             return event.target.dataset.id;
-            // this.client.moves.clickCell(id);
         };
 
         //End Turn
