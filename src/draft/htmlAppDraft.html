@@ -1,0 +1,55 @@
+<table>${rows.join('')}</table>
+<p class="winner"></p>
+<div id="action-container">
+    <!--        <textarea id="text-area" rows="6" cols="80"></textarea>-->
+    <div id="current-player">
+        <p id="player-name"></p>
+        <p id="player-total-money-amount"></p>
+    </div>
+    <input type="button" id="roll" title="Roll the dice and move your token accordingly." value="Roll Dice"/>
+    <input type="button" id="end-turn" title="End turn" value="End turn" style="display:none"/>
+    <input type="button" id="buy-button" title="Buy property." value="Buy" style="display:none"/>
+    <input type="button" id="pass-button" title="Pass on buying property." value="Pass" style="display:none"/>
+    <input type="button" id="sell-button" title="Sell property." value="Sell property" style="display:none"/>
+    <input type="button" id="buy-house-button" title="Buy house" value="Buy House" style="display:none"/>
+    <input type="button" id="sell-house-button" title="Sell house" value="Sell House" style="display:none"/>
+</div>
+<div id="players">
+
+</div>
+<div id="trade-container">
+    <input type="button" id="trade-button" title="Trade" value="Trade" style="display:block"/>
+    <div id="trade-players">
+        <p id="trade-players-text" title="">Propose offer to:</p>
+        <input type="button" class="button-trade-players" id="player-0-button-offer" title="Player 0 offer"  value="0" style="display:block"/>
+        <input type="button" class="button-trade-players" id="player-1-button-offer" title="Player 1 offer"  value="1" style="display:block"/>
+        <input type="button" class="button-trade-players" id="player-2-button-offer" title="Player 2 offer"  value="2" style="display:block"/>
+        <input type="button" class="button-trade-players" id="player-3-button-offer" title="Player 3 offer"  value="3" style="display:block"/>
+    </div>
+    <div id="offer" class="propose-content-containers">
+        <p>Current player offers:</p>
+        <div>
+            <input type="button" class="offer-money-button" id="offered-0-money-amount-button" title="Money offered"  value="0" style="display:block"/>
+            <input type="button" class="offer-money-button" id="offered-10-money-amount-button" title="Money offered"  value="10" style="display:block"/>
+            <input type="button" class="offer-money-button" id="offered-100-money-amount-button" title="Money offered"  value="100" style="display:block"/>
+        </div>
+        <p class="trade-money-amount" id="offered-money-amount-text" title="0">0$</p>
+    </div>
+    <!--            <input type="number" id="offered-money-amount-button" title="Money offered" placeholder="$" value="Amount current player wants" style="display:block"/>-->
+    <div id="receive" class="propose-content-containers">
+        <p>Current player receives:</p>
+        <div>
+            <input type="button" class="require-money-button" id="receive-0-money-amount-button" title="Money received"  value="0" style="display:block"/>
+            <input type="button" class="require-money-button" id="receive-10-money-amount-button" title="Money received"  value="10" style="display:block"/>
+            <input type="button" class="require-money-button" id="receive-100-money-amount-button" title="Money received"  value="100" style="display:block"/>
+        </div>
+        <p class="trade-money-amount" id="receive-money-amount-text" title="0">0$</p>
+    </div>
+    <input type="button" id="propose-button" title="Propose deal" value="Propose offer" style="display:block"/>
+    <!--            <input type="number" id="receive-money-amount-button" title="Money received" placeholder="$" value="Amount current player wants" style="display:block"/>-->
+</div>
+<table id="trade-table">
+    <tr id="trade-row">
+        <td>c</td>
+    </tr>
+</table>

@@ -1,0 +1,839 @@
+// import 'regenerator-runtime/runtime';
+import {Client} from 'boardgame.io/client';
+import {Local} from 'boardgame.io/multiplayer';
+import {TicTacToe} from './Game';
+import {Dice, addMessage} from './Dice.js';
+import {Field, fields} from './Field.js';
+import {Player} from './Player.js';
+// import {Card,cards,getRandomCard } from './Card.js';
+
+var player1 = new Player("Marek", 0, "blue");
+var player2 = new Player("Adam", 1, "green");
+var player3 = new Player("Jurek", 2, "red");
+
+// player1.setTotalMoneyAmount(-10);
+
+const idEndTurn = "end-turn";
+const idRollButton = "roll";
+const idFieldOwner = "owner-";
+const idBuyButton = "buy-button";
+const idPassButton = "pass-button";
+const idSellButton = "sell-button";
+const idBuyHouse = "buy-house-button";
+const idSellHouse = "sell-house-button";
+
+// fields[37].owner=player2;
+// fields[39].owner=player2;
+// fields[37].setComplete=true;
+// fields[39].setComplete=true;
+// console.log(fields[37]);
+// console.log(fields[39]);
+
+class Monopoly {
+    numOfPlayers = 0;
+
+    currentPlayer = 0;
+    currentField = 0;
+    currentFieldObj = fields[this.currentField];
+    turnOver = false;
+    players = [];
+
+    constructor(rootElement, numOfPlayers) {
+        this.numOfPlayers = numOfPlayers;
+        this.client = Client({game: TicTacToe, numPlayers: numOfPlayers});
+        this.client.start();
+        this.rootElement = rootElement;
+        this.createBoard();
+        this.addPlayers();
+        this.attachListeners();
+
+    }
+
+
+    getCurrentPlayer() {
+        return this.currentPlayer;
+    }
+
+    addPlayers() {
+        this.players.push(player1);
+        this.players.push(player2);
+        this.players.push(player3);
+        // console.log(this.players.length);
+
+        const idPlayers = "players";
+        const playersDiv = this.rootElement.querySelector(`#${idPlayers}`);
+        for (var i = 0; i < this.players.length; i++) {
+            let playerDiv = playersDiv.appendChild(document.createElement("div"));
+            playerDiv.id = this.players[i].name;
+            playerDiv.textContent = this.players[i].name;
+        }
+
+    }
+
+
+    createBoard() {
+        // Create cells in rows for the Tic-Tac-Toe board.
+        const rows = [];
+        for (let i = 0; i < 11; i++) {
+            const cells = [];
+            if (i == 0 || i == 10) {
+                if (i == 0) {
+                    var id = 20;
+                    for (let j = 0; j < 11; j++) {
+                        cells.push(`<td class="cell" id="cell-${id}" data-id="${id}"></td>`);
+                        id++;
+                    }
+                } else if (i == 10) {
+                    var id = 10;
+                    for (let j = 0; j < 11; j++) {
+                        cells.push(`<td class="cell" id="cell-${id}" data-id="${id}"></td>`);
+                        id--;
+                    }
+                }
+            } else {
+                var id = 0;
+                for (let j = 0; j < 3; j++) {
+                    if (i == 1) {
+                        if (j == 0) {
+                            id = 19;
+                        } else if (j == 2) {
+                            id = 31;
+                        } else {
+                            id = "mid";
+                        }
+                    } else if (i == 2) {
+                        if (j == 0) {
+                            id = 18;
+                        } else if (j == 2) {
+                            id = 32;
+                        } else {
+                            id = "mid";
+                        }
+                    } else if (i == 3) {
+                        if (j == 0) {
+                            id = 17;
+                        } else if (j == 2) {
+                            id = 33;
+                        } else {
+                            id = "mid";
+                        }
+                    } else if (i == 4) {
+                        if (j == 0) {
+                            id = 16;
+                        } else if (j == 2) {
+                            id = 34;
+                        } else {
+                            id = "mid";
+                        }
+                    } else if (i == 5) {
+                        if (j == 0) {
+                            id = 15;
+                        } else if (j == 2) {
+                            id = 35;
+                        } else {
+                            id = "mid";
+                        }
+                    } else if (i == 6) {
+                        if (j == 0) {
+                            id = 14;
+                        } else if (j == 2) {
+                            id = 36;
+                        } else {
+                            id = "mid";
+                        }
+                    } else if (i == 7) {
+                        if (j == 0) {
+                            id = 13;
+                        } else if (j == 2) {
+                            id = 37;
+                        } else {
+                            id = "mid";
+                        }
+                    } else if (i == 8) {
+                        if (j == 0) {
+                            id = 12;
+                        } else if (j == 2) {
+                            id = 38;
+                        } else {
+                            id = "mid";
+                        }
+                    } else if (i == 9) {
+                        if (j == 0) {
+                            id = 11;
+                        } else if (j == 2) {
+                            id = 39;
+                        } else {
+                            id = "mid";
+                        }
+                    }
+                    if (j == 1) {
+                        cells.push(`<td class="cell" colspan="9"  data-id="${id}"></td>`);
+                    } else if (j == 0) {
+                        cells.push(`<td class="cell" id="cell-${id}" data-id="${id}"></td>`);
+                    } else {
+                        cells.push(`<td class="cell" id="cell-${id}" data-id="${id}"></td>`);
+                    }
+                }
+            }
+            rows.push(`<tr>${cells.join('')}</tr>`);
+        }
+
+        // Add the HTML to our monopoly <div>.
+        // We’ll use the empty <p> to display the game winner later.
+        this.rootElement.innerHTML = `
+      <table>${rows.join('')}</table>
+      <p class="winner"></p>
+      <div id="action-container">
+<!--        <textarea id="text-area" rows="6" cols="80"></textarea>-->
+        <div id="current-player">
+            <p id="player-name"></p>
+            <p id="player-total-money-amount"></p>
+        </div>
+            <input type="button" id="roll" title="Roll the dice and move your token accordingly." value="Roll Dice"/>
+             <input type="button" id="end-turn" title="End turn" value="End turn" style="display:none"/>
+            <input type="button" id="buy-button" title="Buy property." value="Buy" style="display:none"/>
+            <input type="button" id="pass-button" title="Pass on buying property." value="Pass" style="display:none"/>
+            <input type="button" id="sell-button" title="Sell property." value="Sell property" style="display:none"/>
+            <input type="button" id="buy-house-button" title="Buy house" value="Buy House" style="display:none"/>
+            <input type="button" id="sell-house-button" title="Sell house" value="Sell House" style="display:none"/>
+      </div>
+      <div id="players">
+
+      </div>
+    `;
+        this.createRowsContent();
+    }
+
+    createRowsContent() {
+        let count = 0;
+        for (let k = 0; k <= 39; k++) {
+            let cell = document.getElementById("cell-" + k);
+            cell.textContent = k;
+            // let cellDiv = cell.appendChild(document.createElement("div"));
+            // cellDiv.setAttribute("id", "cell-div-" + k);
+            // // fieldName.textContent=""+fields[k].name+k;
+            // cellDiv.textContent = "" + k;
+            // cellDiv.className = "cell-div";
+
+
+            var owner = cell.appendChild(document.createElement("div"));
+            owner.id = "owner-" + k;
+            owner.className = "cell-owner"
+            owner.title = fields[k].owner;
+
+            var cellName = cell.appendChild(document.createElement("div"));
+            cellName.id = "cell-name-" + k;
+            cellName.className = "cell-name";
+            cellName.style.backgroundColor = fields[k].color;
+            cellName.title = fields[count].name;
+
+            var playerOnField = cell.appendChild(document.createElement("div"));
+            playerOnField.id = "player-on-field-" + k;
+            playerOnField.className = "player-on-field";
+            playerOnField.title = " ";
+
+            count++;
+        }
+        let table = document.getElementById("board");
+    }
+
+    roll() {
+        var dice1 = new Dice().rollDice();
+        var dice2 = new Dice().rollDice();
+        var player = this.players[this.currentPlayer];
+
+        console.log("Current player number!!!!!!!!!!!!!!! " + this.currentPlayer);
+
+        console.log("Current player number!!!!!!!!!!!!!!! " + this.players[this.currentPlayer].name);
+        let positionBeforeMoving = this.players[this.currentPlayer].lastKnownPosition;
+        var lastKnownPlayerPosition = this.players[this.currentPlayer].lastKnownPosition;
+        console.log("last knownPosition!!!!!!!!!!!!!!! " + lastKnownPlayerPosition);
+
+
+        var pl = this.players.length - 1;
+        console.log("Players length " + pl);
+
+
+        const idPlayerOnField = "player-on-field-";
+        const playerOnPrevField = this.rootElement.querySelector(`#${idPlayerOnField + this.currentField}`);
+        playerOnPrevField.title = "";
+
+
+        this.currentField = this.players[this.currentPlayer].lastKnownPosition;
+        console.log("BeforeSumField=" + this.currentField);
+        let sum = dice1 + dice2;
+        console.log("suma=" + sum);
+
+        if ((lastKnownPlayerPosition + sum) > 39) {
+            var eq = 39 - lastKnownPlayerPosition
+            lastKnownPlayerPosition = (sum - eq) - 1;
+            this.players[this.currentPlayer].addMoney(200);
+            console.log("Player" + this.players[this.currentPlayer].name + " crossed start!!! His balance is now " + this.players[this.currentPlayer].totalMoneyAmount);
+            // lastKnownPlayerPosition=(sum+lastKnownPlayerPosition)-lastKnownPlayerPosition;
+            // lastKnownPlayerPosition=(sum+lastKnownPlayerPosition)%lastKnownPlayerPosition;
+        } else {
+            lastKnownPlayerPosition = lastKnownPlayerPosition + sum;
+        }
+        this.currentField = lastKnownPlayerPosition;
+        // lastKnownPlayerPosition=lastKnownPlayerPosition+sum;
+
+        var currentFieldObj = fields[this.currentField];
+        // console.log(currentFieldObj);
+
+        console.log("last knownPosition!!!!!!!!!!!!!!! " + lastKnownPlayerPosition);
+
+        addMessage("Player " + this.players[this.currentPlayer].name + " moved to field " + this.currentField);
+        console.log("AfterSumField=" + this.currentField);
+        this.players[this.currentPlayer].lastKnownPosition = this.currentField;
+
+
+        const playerOnCurrentField = this.rootElement.querySelector(`#${idPlayerOnField + this.currentField}`);
+        playerOnCurrentField.title = "" + this.currentPlayer;
+
+
+        const fieldOwner = this.rootElement.querySelector(`#${idFieldOwner + this.currentField}`);
+
+        const rollButton = this.rootElement.querySelector(`#${idRollButton}`);
+        const buyButton = this.rootElement.querySelector(`#${idBuyButton}`);
+        const passButton = this.rootElement.querySelector(`#${idPassButton}`);
+        const endButton = this.rootElement.querySelector(`#${idEndTurn}`);
+
+        if (fieldOwner.title == "null") {
+            rollButton.style.display = "none";
+            buyButton.style.display = "block"
+            passButton.style.display = "block";
+
+        } else if (fieldOwner.title == "bank") {
+            // console.log(players[currentPlayer]);
+            // // getRandomCard();
+            // cards[4].method();
+            // // console.log(cards.length);
+            // console.log(players[currentPlayer].totalMoneyAmount);
+            rollButton.style.display = "none";
+            endButton.style.display = "block";
+        } else if (fieldOwner.title == "government") {
+            // collectTuition();
+            rollButton.style.display = "none";
+            endButton.style.display = "block";
+
+        } else if (fieldOwner.title != player.name) {
+            console.log("Payment");
+            // console.log("Is the house build "+field.oneHouseBuild);
+            var amount = currentFieldObj.getCurrentRevenue();
+            if (player.subtractMoney(amount)) {
+
+                currentFieldObj.owner.addMoney(amount);
+                addMessage("Player " + player.name + " has paid " + currentFieldObj.getCurrentRevenue() + "$ to " + currentFieldObj.owner.name + "\n")
+            } else {
+                addMessage("Player does not have enough money to pay\n");
+            }
+
+        }
+        const buyHouseButton = this.rootElement.querySelector(`#${idBuyHouse}`);
+        buyHouseButton.style.display = "block";
+
+        const sellButton = this.rootElement.querySelector(`#${idSellButton}`);
+        sellButton.style.display = "block";
+
+
+        this.updatePlayerInfo(this.currentPlayer);
+        this.movePlayerDivBox(positionBeforeMoving);
+        console.log("\n");
+        return sum;
+    }
+
+    buyProperty() {
+        //We have to hide roll button
+        // console.log("c");
+        let fieldOwner = document.getElementById("owner-" + this.currentField);
+        let fieldPosition = document.getElementById("cell-" + this.currentField);
+        let playerFieldsTable = document.getElementById("buy-table");
+
+        if (fieldOwner.title == "null") {
+            var player = this.players[this.currentPlayer];
+            var fieldCost = fields[this.currentField].cost;
+            if (player.subtractMoney(fieldCost) == true) {
+                fieldOwner.title = player.number;
+                console.log(player.name + " has bought " + fieldPosition.textContent);
+
+                fields[this.currentField].owner = player;
+
+
+                // fieldPosition.style.backgroundColor = player.color;
+                fieldPosition.style.border = "3px solid " + player.color;
+                // console.log(fields[currentField].owner);
+
+                //Creating bought properties table row
+                // let tableRow = playerFieldsTable.appendChild(document.createElement("tr"));
+                // let tableData = tableRow.appendChild(document.createElement("td"));
+                // let tableDiv = tableData.appendChild(document.createElement("div"));
+                // let tableSellButton = tableData.appendChild(document.createElement("input"));
+                // tableDiv.innerHTML = fields[this.currentField].name;
+                // tableDiv.id = "field-" + fields[this.currentField].name;
+                // tableDiv.title = this.currentField + "";
+                // tableSellButton.type = "button";
+                // tableSellButton.value = "sell";
+                // tableSellButton.className = "sell-button";
+                // tableSellButton.id = "sell-button" + player.number;
+
+
+                addMessage("New owner of the field " + fields[this.currentField].name + " is " + fields[this.currentField].owner.name);
+                // console.log("New owner of the field is " + fields[currentField].owner.name);
+            }
+        } else {
+            addMessage("Field is already owned");
+            // console.log("Field is already owned");
+        }
+        const buyButton = this.rootElement.querySelector(`#${idBuyButton}`);
+        const passButton = this.rootElement.querySelector(`#${idPassButton}`);
+        const rollButton = this.rootElement.querySelector(`#${idRollButton}`);
+        const endButton = this.rootElement.querySelector(`#${idEndTurn}`);
+
+
+        buyButton.style.display = "none";
+        passButton.style.display = "none";
+        rollButton.style.display = "none";
+        endButton.style.display = "block";
+        this.updatePlayerInfo(this.currentPlayer);
+        console.log("\n");
+    }
+
+    sellProperty(fieldObj, fieldNumber,currentPlayerObj) {
+        // let fieldOwner = document.getElementById("owner-" + this.currentField);
+        // console.log(fieldObj.owner);
+        // console.log(fieldNumber);
+        let fieldPosition = document.getElementById("cell-" + fieldNumber);
+
+        if (fieldObj.owner == currentPlayerObj) {
+            console.log(fieldObj.name);
+
+            console.log("players money before selling " + currentPlayerObj.totalMoneyAmount);
+            if(currentPlayerObj.addMoney(fieldObj.getSellValue())>0){
+                console.log("After selling " + currentPlayerObj.totalMoneyAmount);
+
+                fieldObj.owner = null;
+
+                this.updatePlayerInfo(currentPlayerObj.number);
+                fieldPosition.style.border = "1px solid black";
+                addMessage("Player " + currentPlayerObj.name + " sold " + fieldObj.name + " and received " + fieldObj.getSellValue());
+            }
+
+
+        } else {
+            addMessage("You don't own that field, so you cannot sell it");
+        }
+    }
+
+    buyHouse(fieldObj, fieldNumber,currentPlayerObj){
+        if (fieldObj.owner == currentPlayerObj) {
+            console.log("is set complete " + fields[fieldNumber].setComplete);
+            if (fieldObj.setComplete == true) {
+                currentPlayerObj.buyHouse(fieldObj);
+                this.updatePlayerInfo(currentPlayerObj.number);
+            } else {
+                addMessage("You dont have all the fields of that color. Gain all the fields of that color type first.");
+            }
+        } else {
+            addMessage("You dont own that field");
+        }
+    }
+
+    checkIfSetComplete() {
+        //We check if player just completed set
+        //--------------------------------------------
+        var numberOfFieldsInThisColor = 0;
+        var howManyPlayerOwns = 0;
+        var setComplete = false;
+        // console.log("current field "+this.currentField);
+        // console.log("current field color "+fields[this.currentField].color);
+        // console.log("current field owner "+fields[this.currentField].owner);
+
+        //We loop through all fields
+        for (let h = 0; h < fields.length; h++) {
+            //We check if color of selected field is the same as the one from loop
+            if (fields[this.currentField].color == fields[h].color) {
+                //We check if the owner of the field is also the current player
+                if (fields[this.currentField].owner == fields[h].owner && fields[h].owner != null) {
+                    howManyPlayerOwns++;
+                    // console.log("owner");
+                }
+                numberOfFieldsInThisColor++;
+                // console.log("how many in this color "+numberOfFieldsInThisColor);
+                // console.log("how many owns "+howManyPlayerOwns);
+                // console.log(fields[this.currentField].owner.name);
+            }
+        }
+        //If current player owns all the fields of the concrete color
+        //Every field of that color, will be marked as a complete set
+        if (numberOfFieldsInThisColor == howManyPlayerOwns) {
+            console.log("set complete");
+            setComplete = true;
+        }
+
+        for (let g = 0; g < fields.length; g++) {
+            if (fields[this.currentField].color == fields[g].color) {
+                if (setComplete == true) {
+                    // console.log("cos");
+                    fields[g].setComplete = true;
+                    console.log("Set complete");
+                }
+            }
+        }
+        //-----------------------------------------------
+    }
+
+    pass() {
+        const buyButton = this.rootElement.querySelector(`#${idBuyButton}`);
+        const passButton = this.rootElement.querySelector(`#${idPassButton}`);
+        const rollButton = this.rootElement.querySelector(`#${idRollButton}`);
+        const endButton = this.rootElement.querySelector(`#${idEndTurn}`);
+
+        buyButton.style.display = "none";
+        passButton.style.display = "none";
+        rollButton.style.display = "none";
+        endButton.style.display = "block";
+
+        this.updatePlayerInfo(this.currentPlayer);
+        console.log("\n");
+    }
+
+    removePlayer() {
+        // this.client.moves.eliminate(this.currentPlayer);
+        this.players.splice(this.currentPlayer, 1);
+        console.log("length of array after deleting " + this.players.length);
+    }
+
+    updatePlayerInfo(paramCurrentPlayer) {
+        // let playerNameText = document.getElementById("player-name");
+        // let playerMoneyAmountText = document.getElementById("player-total-money-amount");
+        // let currentPlayerContainer = document.getElementById("current-player");
+        const idPlayerName = "player-name";
+        const playerName = this.rootElement.querySelector(`#${idPlayerName}`);
+        playerName.innerHTML = this.players[paramCurrentPlayer].name;
+
+        const idPlayerTotalMoneyAmount = "player-total-money-amount";
+        const playerMoneyAmount = this.rootElement.querySelector(`#${idPlayerTotalMoneyAmount}`);
+        playerMoneyAmount.innerHTML = this.players[paramCurrentPlayer].totalMoneyAmount + "$";
+
+        const idCurrentPlayer = "current-player";
+        const currentPlayer = this.rootElement.querySelector(`#${idCurrentPlayer}`);
+        currentPlayer.style.border = "1px solid " + this.players[paramCurrentPlayer].color;
+        // currentPlayerContainer.style.border = "1px solid " + this.players[paramCurrentPlayer].color;
+    }
+
+    movePlayerDivBox(positionBeforeMoving) {
+        console.log(this.players[this.currentPlayer].lastKnownPosition);
+        const idPlayerOnCurrentField = "player-on-field-";
+        const playerOnCurrentField = this.rootElement.querySelector(`#${idPlayerOnCurrentField + this.currentField}`);
+        playerOnCurrentField.title = "" + this.currentPlayer;
+
+
+        let lastPlayerPosition = this.rootElement.querySelector(`#${idPlayerOnCurrentField + positionBeforeMoving}`);
+        lastPlayerPosition.style.backgroundColor = "white";
+        // console.log("Current player " + currentPlayer + " position is " + currentPlayerPosition);
+        playerOnCurrentField.style.backgroundColor = this.players[this.currentPlayer].color;
+    }
+
+        attachListeners() {
+            // This event handler will read the cell id from a cell’s
+            // `data-id` attribute and make the `clickCell` move.
+            const endTurnButton = this.rootElement.querySelector(`#${idEndTurn}`);
+            const rollButton = this.rootElement.querySelector(`#${idRollButton}`);
+            const buyButton = this.rootElement.querySelector(`#${idBuyButton}`);
+            const sellButton = this.rootElement.querySelector(`#${idSellButton}`);
+            const passButton = this.rootElement.querySelector(`#${idPassButton}`);
+            const buyHouseButton = this.rootElement.querySelector(`#${idBuyHouse}`);
+            const proposeButton = this.rootElement.querySelector(`#${idProposeButton}`);
+            const tradeButton = this.rootElement.querySelector(`#${idTradeButton}`);
+
+            let houseButtonClicked = false;
+            let sellButtonClicked = false;
+            //If propose button is clicked, send offer to other player
+            let proposeButtonClicked = false;
+            //If trade button is clicked, allow trading
+            let tradeButtonClicked = false;
+            var tradeWithPlayer = -1;
+
+
+            //Clicking the cell
+            const handleCellClick = event => {
+                let currentPlayerObj = this.players[this.currentPlayer];
+                var fieldNumber = event.target.dataset.id;
+                const fieldOwnerDiv = this.rootElement.querySelector(`#${idFieldOwner + fieldNumber}`);
+                var fieldObj = fields[fieldNumber];
+                // console.log(fieldNumber);
+
+                if (houseButtonClicked == true) {
+                    // console.log("current field Number " + fieldOwner.title);
+                    // console.log("current player " + this.currentPlayer)
+                    // console.log("current player " + currentPlayerObj.number)
+                    this.buyHouse(fieldObj, fieldNumber, currentPlayerObj);
+                } else if (sellButtonClicked == true) {
+                    this.sellProperty(fieldObj, fieldNumber, currentPlayerObj, fieldOwnerDiv);
+                } else if (tradeButtonClicked == true) {
+                    console.log("Is trade button clicked " + tradeButtonClicked);
+                    console.log("Trade with player " + tradeWithPlayer);
+                    var offeredFields= [];
+                    var wantedFields=[];
+                    if(fieldObj.partOfTrade!=true){
+                        console.log("field obj owner " + fieldObj.owner.number);
+                        fieldObj.partOfTrade=true;
+                        var row = document.getElementById("trade-row");
+                        if(fieldObj.owner== currentPlayerObj){
+                            offeredFields.push(fieldObj);
+                            var rowData = row.appendChild(document.createElement("td"));
+                            rowData.innerHTML = fieldObj.name;
+                            rowData.className = "cell";
+                            rowData.id = "cell-" + fieldNumber;
+
+                            var owner = rowData.appendChild(document.createElement("div"));
+                            owner.id = "owner-" + fieldNumber;
+                            owner.className = "cell-owner"
+                            owner.title = fieldObj.owner;
+
+                            var cellName = rowData.appendChild(document.createElement("div"));
+                            cellName.id = "cell-name-" + fieldNumber;
+                            cellName.className = "cell-name";
+                            cellName.style.backgroundColor = fieldObj.color;
+                            cellName.title = fieldObj.name;
+                        }else if(fieldObj.owner.number == tradeWithPlayer){
+                            wantedFields.push(fieldObj);
+                                var rowData = row.appendChild(document.createElement("td"));
+                                rowData.innerHTML = fieldObj.name;
+                                rowData.className = "cell";
+                                rowData.id = "cell-" + fieldNumber;
+
+                                var owner = rowData.appendChild(document.createElement("div"));
+                                owner.id = "owner-" + fieldNumber;
+                                owner.className = "cell-owner"
+                                owner.title = fieldObj.owner;
+
+                                var cellName = rowData.appendChild(document.createElement("div"));
+                                cellName.id = "cell-name-" + fieldNumber;
+                                cellName.className = "cell-name";
+                                cellName.style.backgroundColor = fieldObj.color;
+                                cellName.title = fieldObj.name;
+
+                                console.log("works");
+                        }
+                        // if (fieldObj.owner != null) {
+                            // console.log("field obj owner " + fieldObj.owner.number);
+                            // fieldObj.partOfTrade=true;
+                            // var row = document.getElementById("trade-row");
+
+                            // if (fieldObj.owner.number == tradeWithPlayer) {
+                            //     var rowData = row.appendChild(document.createElement("td"));
+                            //     rowData.innerHTML = fieldObj.name;
+                            //     rowData.className = "cell";
+                            //     rowData.id = "cell-" + fieldNumber;
+                            //
+                            //     var owner = rowData.appendChild(document.createElement("div"));
+                            //     owner.id = "owner-" + fieldNumber;
+                            //     owner.className = "cell-owner"
+                            //     owner.title = fieldObj.owner;
+                            //
+                            //     var cellName = rowData.appendChild(document.createElement("div"));
+                            //     cellName.id = "cell-name-" + fieldNumber;
+                            //     cellName.className = "cell-name";
+                            //     cellName.style.backgroundColor = fieldObj.color;
+                            //     cellName.title = fieldObj.name;
+                            //
+                            //     console.log("works");
+                            //
+                            // }
+                        // }
+                    }
+                    // this.trade();
+                }
+                houseButtonClicked = false;
+                sellButtonClicked = false;
+                // proposeButtonClicked=false;
+
+                const id = parseInt(event.target.dataset.id);
+                // console.log(event.target.dataset.id);
+                return event.target.dataset.id;
+                // this.client.moves.clickCell(id);
+            };
+
+            //End Turn
+            const handleEndTurnClick = event => {
+                const endButton = this.rootElement.querySelector(`#${idEndTurn}`);
+
+                // console.log("number of players " + this.players.length);
+                console.log("Current totalMoney amount of current player " + this.players[this.currentPlayer].totalMoneyAmount);
+
+                if (this.players[this.currentPlayer].totalMoneyAmount < 0) {
+                    this.removePlayer();
+                }
+
+                this.currentPlayer++;
+                if (this.currentPlayer == this.players.length) {
+                    console.log("current player reset");
+                    this.currentPlayer = 0;
+                }
+                rollButton.style.display = "block";
+
+                buyHouseButton.style.display = "none";
+                houseButtonClicked = false;
+
+                sellButton.style.display = "none";
+
+                console.log("current player number " + this.currentPlayer);
+                console.log("\n");
+                endButton.style.display = "none";
+
+                //You can buy houses only at the beginning of the round
+                this.checkIfSetComplete();
+
+                this.client.moves.endTurn();
+            };
+            endTurnButton.onclick = handleEndTurnClick;
+
+            //Roll Dice
+            const handleRollButtonClick = event => {
+                this.roll();
+            };
+            rollButton.onclick = handleRollButtonClick;
+
+
+            //Buy property
+            const handleBuyButtonClick = event => {
+                this.buyProperty();
+            };
+            buyButton.onclick = handleBuyButtonClick;
+
+            //Pass on buying property
+            const handlePassButtonClick = event => {
+                this.pass();
+            };
+            passButton.onclick = handlePassButtonClick;
+
+            //Sell property
+            const handleSellButtonClick = event => {
+                sellButtonClicked = true;
+            };
+            sellButton.onclick = handleSellButtonClick;
+
+            //Buy House on property
+            const handleBuyHouseButtonClick = event => {
+                houseButtonClicked = true;
+            };
+            buyHouseButton.onclick = handleBuyHouseButtonClick;
+
+            //Propose offer
+            const handleProposeButtonClick = event => {
+                proposeButtonClicked = true;
+            };
+            proposeButton.onclick = handleProposeButtonClick;
+
+            //Trade with another player
+            const handleTradeButtonClick = event => {
+                tradeButtonClicked = true;
+            };
+            tradeButton.onclick = handleTradeButtonClick;
+
+            // Attach the event listener to each of the board cells.
+            const cells = this.rootElement.querySelectorAll('.cell');
+
+
+            // Increase money amount, current player offers in trade
+            const offerAmountIncrease = this.rootElement.querySelectorAll('.offer-money-button');
+            var amountOffered = parseInt("" + document.getElementById("offered-money-amount-text").title);
+            // console.log(amountOffered);
+
+
+            offerAmountIncrease.forEach(buttonAmount => {
+                buttonAmount.addEventListener("click", function () {
+                    var buttonVal = parseInt("" + buttonAmount.value)
+                    if (buttonVal == 0) {
+                        amountOffered = 0;
+                    } else {
+                        amountOffered = amountOffered + buttonVal;
+                    }
+                    document.getElementById("offered-money-amount-text").title = amountOffered;
+                    document.getElementById("offered-money-amount-text").innerHTML = amountOffered + "$";
+                });
+            });
+
+            // Increase money amount, current player WANTS!!! from the other player in trade
+
+            const requireAmountIncrease = this.rootElement.querySelectorAll('.require-money-button');
+            var amountRequired = parseInt("" + document.getElementById("receive-money-amount-text").title);
+            // console.log(amountOffered);
+
+
+            requireAmountIncrease.forEach(buttonAmount => {
+                buttonAmount.addEventListener("click", function () {
+                    var buttonVal = parseInt("" + buttonAmount.value);
+                    console.log(buttonVal);
+                    if (buttonVal == 0) {
+                        amountRequired = 0;
+                    } else {
+                        amountRequired = amountRequired + buttonVal;
+                    }
+                    document.getElementById("receive-money-amount-text").title = amountRequired;
+                    document.getElementById("receive-money-amount-text").innerHTML = amountRequired + "$";
+                });
+            });
+            // requireAmountIncrease.forEach(buttonAmount => {
+            //     var buttonVal = parseInt("" + buttonAmount.value);
+            //     buttonAmount.addEventListener("click", this.increaseTradeReceiveAmount(buttonVal,amountRequired));
+            // });
+
+
+            const playerToTradeWith = this.rootElement.querySelectorAll('.button-trade-players');
+            var playerTradeText = document.getElementById("trade-players-text");
+
+            playerToTradeWith.forEach(playerButton => {
+                playerButton.addEventListener("click", function () {
+                    var playerButtonVal = parseInt("" + playerButton.value);
+                    console.log(playerButtonVal);
+                    tradeWithPlayer = playerButtonVal;
+                    playerTradeText.title = "" + playerButtonVal;
+                    playerTradeText.innerHTML = "Propose offer to player :" + playerButtonVal;
+                });
+            });
+
+            cells.forEach(cell => {
+                cell.onclick = handleCellClick;
+            });
+        }
+
+    update(state) {
+        // Get all the board cells.
+        const cells = this.rootElement.querySelectorAll('.cell');
+        // Update cells to display the values in game state.
+        cells.forEach(cell => {
+            const cellId = parseInt(cell.dataset.id);
+            const cellValue = state.G.cells[cellId];
+            cell.textContent = cellValue !== null ? cellValue : '';
+        });
+        // Get the gameover message element.
+        const messageEl = this.rootElement.querySelector('.winner');
+        // Update the element to show a winner if any.
+        if (state.ctx.gameover) {
+            messageEl.textContent =
+                state.ctx.gameover.winner !== undefined
+                    ? 'Winner: ' + state.ctx.gameover.winner
+                    : 'Draw!';
+        } else {
+            messageEl.textContent = '';
+        }
+    }
+
+    // addMessage(e) {
+    //     const idTextArea = "text-area";
+    //     const textArea = this.rootElement.querySelector(`#${idTextArea}`);
+    //     textArea.scrollTop = textArea.scrollHeight;
+    //     textArea.innerHTML += e + "\n";
+    // }
+}
+
+
+const appElement = document.getElementById('monopoly');
+const monopoly = new Monopoly(appElement, 3);
+
+module.exports = {
+    Monopoly: Monopoly,
+    monopoly: monopoly,
+};

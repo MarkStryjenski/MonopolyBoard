@@ -1,0 +1,161 @@
+/*.cell-name{*/
+/*    !*background-color: red;*!*/
+/*    display: block;*/
+/*    width: 100%;*/
+/*    height: 10px;*/
+/*    !*top: 0px;*!*/
+/*    !*right: 0px;*!*/
+/*    !*position: absolute;*!*/
+/*}*/
+
+body {
+    background: #FFFFFF;
+    margin: 0px;
+    min-width: 1075px;
+}
+
+.cell {
+    border: 1px solid #555;
+    width: 90px;
+    height: 100px;
+    line-height: 30px;
+    text-align: center;
+    position: relative;
+    font-size: 15px;
+    /*font-family:;*/
+}
+/*TEXT AREA */
+#text-area{
+    position: absolute;
+    top: 200px;
+    left: 190px;
+}
+
+#all-interactions-container{
+    position: absolute;
+    top: 400px;
+    left: 230px;
+}
+
+.cell-name{
+    /*background-color: red;*/
+    display: block;
+    width: 100%;
+    height: 10px;
+    /*top: 0px;*/
+    /*right: 0px;*/
+    /*position: absolute;*/
+}
+.player-on-field{
+    display: block;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    top: 15px;
+    /*background-color: red;*/
+
+}
+.cell-position{
+    position: relative;
+
+    /*background-color: red;*/
+}
+.coffeeMachineImg{
+    /*object-fit: cover;*/
+    width: 100%;
+    /*position: absolute;*/
+    /*top: 0px;*/
+}
+#textArea{
+    border: 3px solid #cccccc;
+
+}
+
+#action-container{
+    border: 1px solid red;
+    width: 700px;
+    position: relative;
+    /*height:200px;*/
+
+}
+
+#roll{
+    display: block;
+}
+#current-player{
+    position: absolute;
+    /*width: ;*/
+    right: 50px;
+    top: 0px;
+    display: block;
+
+}
+
+.player-actions{
+    width: 70px;
+    border: 1px solid green;
+}
+
+.sell-button{
+    display: block;
+}
+
+/* TRADING */
+#trade-container{
+    /*background-color: green;*/
+    border: 1px solid darkgreen;
+    width: 250px;
+
+}
+.propose-content-containers{
+    position: relative;
+    /*background-color: red;*/
+    width: 200px;
+}
+
+.trade-money-amount{
+    position: absolute;
+    right: 0px;
+    top: 40px;
+}
+
+#trade-players{
+    position: relative;
+    height: 100px;
+}
+
+.button-trade-players{
+    position: absolute;
+    right: 0px;
+}
+#trade-players-text{
+    position: absolute;
+    left: 0px;
+    top: 30px;
+}
+#player-0-button-offer{
+    top: 0px;
+}
+#player-1-button-offer{
+    top: 25px;
+}
+#player-2-button-offer{
+    top: 50px;
+}
+#player-3-button-offer{
+    top: 75px;
+}
+
+/*.board-bottom .cellOwner {*/
+/*    bottom: -25px;*/
+
+/*    height: 15px;*/
+
+
+
+
+/*    left: 0px;*/
+/*    width: 72px;*/
+/*}*/
+
+/*# sourceMappingURL=/style.e308ff8e.css.map */
